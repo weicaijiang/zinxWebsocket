@@ -115,6 +115,7 @@ func (c *Connection) StartWriter() {
 			if err := c.Conn.WriteMessage(msg.MessageType, msg.Data); err != nil {
 				//写失败通知关闭连接
 				log.Println("connection StartWriter err:", err)
+				return
 			}
 		case <-c.ExitChan:
 			//读出错了
