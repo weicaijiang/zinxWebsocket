@@ -12,8 +12,8 @@ type IConnManager interface {
 	Get(connID uint32) (IConnection, error)
 
 	//总连接个数
-	Len() uint32
+	Len() int
 
 	//清除全部连接
-	ClearAll()
+	ClearConn()
 }

@@ -33,9 +33,9 @@ func (mh *MsgHandle) DoMsgHandler(request ziface.IRequest) {
 		log.Println("msghandle DoMsgHandler not register msgid:", request.GetMsgId())
 		return
 	}
-	handler.BeforeHandle(request)
+	handler.PreHandle(request)
 	handler.Handle(request)
-	handler.AfterHandle(request)
+	handler.PostHandle(request)
 }
 
 //添加路由

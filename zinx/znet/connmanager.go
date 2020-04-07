@@ -53,12 +53,12 @@ func (connMgr *ConnManager) Get(connID uint32) (ziface.IConnection, error) {
 }
 
 //总连接个数
-func (connMgr *ConnManager) Len() uint32 {
-	return uint32(len(connMgr.connnections))
+func (connMgr *ConnManager) Len() int {
+	return len(connMgr.connnections)
 }
 
 //清除全部连接
-func (connMgr *ConnManager) ClearAll() {
+func (connMgr *ConnManager) ClearConn() {
 	//共享锁
 	connMgr.connLock.Lock()
 	defer connMgr.connLock.Unlock()
@@ -67,5 +67,5 @@ func (connMgr *ConnManager) ClearAll() {
 		conn.Stop()
 		delete(connMgr.connnections, connID)
 	}
-	log.Println("connmanager ClearAll success")
+	log.Println("connmanager ClearConn success")
 }

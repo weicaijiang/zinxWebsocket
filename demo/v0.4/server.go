@@ -12,8 +12,8 @@ type PingRouter struct {
 }
 
 //处理业务之前
-func (br *PingRouter) BeforeHandle(request ziface.IRequest) {
-	// log.Println("test BeforeHandle")
+func (br *PingRouter) PreHandle(request ziface.IRequest) {
+	// log.Println("test PreHandle")
 	err := request.GetConnection().GetWsConnection().WriteMessage(request.GetMessageType(), []byte("ping before"))
 	if err != nil {
 		log.Println("test Handle err:", err)
@@ -30,8 +30,8 @@ func (br *PingRouter) Handle(request ziface.IRequest) {
 }
 
 //处理业务之后
-func (br *PingRouter) AfterHandle(request ziface.IRequest) {
-	// log.Println("test AfterHandle")
+func (br *PingRouter) PostHandle(request ziface.IRequest) {
+	// log.Println("test PostHandle")
 	err := request.GetConnection().GetWsConnection().WriteMessage(request.GetMessageType(), []byte("ping after"))
 	if err != nil {
 		log.Println("test Handle err:", err)

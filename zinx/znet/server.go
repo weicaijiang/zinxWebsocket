@@ -57,7 +57,7 @@ func (s *Server) wsHandler(w http.ResponseWriter, r *http.Request) {
 	// defer conn.Close()
 
 	// 判断是否超出个数
-	if int(s.ConnMgr.Len()) >= utils.GlobalObject.MaxConn {
+	if s.ConnMgr.Len() >= utils.GlobalObject.MaxConn {
 		//todo 给用户发一个关闭连接消息
 		log.Println("server wsHandler too many connection")
 		conn.Close()
@@ -89,7 +89,7 @@ func (s *Server) Start() {
 func (s *Server) Stop() {
 	log.Println("server stop name:", s.Name)
 	//停止所有连接
-	s.ConnMgr.ClearAll()
+	s.ConnMgr.ClearConn()
 }
 
 //运行状态

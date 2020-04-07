@@ -7,13 +7,13 @@ type BaseRouter struct {
 }
 
 //处理业务之前
-func (br *BaseRouter) BeforeHandle(request ziface.IRequest) {}
+func (br *BaseRouter) PreHandle(request ziface.IRequest) {}
 
 //处理业务
 func (br *BaseRouter) Handle(request ziface.IRequest) {}
 
 //处理业务之后
-func (br *BaseRouter) AfterHandle(request ziface.IRequest) {}
+func (br *BaseRouter) PostHandle(request ziface.IRequest) {}
 
 //路由
 type Router struct {
