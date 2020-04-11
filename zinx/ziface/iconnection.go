@@ -23,8 +23,11 @@ type IConnection interface {
 	//获取连接客户端的状态 ip 端口
 	RemoteAddr() net.Addr
 
-	//发送数据，将数据发送给远程客户端
-	SendMsg(messageType int, id uint32, data []byte) error
+	//发送数据，将数据发送给远程客户端（无缓冲）
+	SendMsg(messageType int, id uint32, data string) error
+
+	//发送数据，将数据发送给远程客户端（有缓冲）
+	SendBuffMsg(messageType int, id uint32, data string) error
 
 	//设置连接属性
 	SetProperty(key string, value interface{})

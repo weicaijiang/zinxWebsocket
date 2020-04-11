@@ -4,7 +4,7 @@ package ziface
 //数据必须是 {id:200,data:""} 之后再base64WriteMessage编码
 type IDataPack interface {
 	//封包
-	Pack(msg IMessage) ([]byte, error)
+	Pack(msg IMessage) (string, error)
 	//拆包
-	Unpack(messageType int, data []byte) (IMessage, error)
+	Unpack(messageType int, data string) (IMessage, error)
 }

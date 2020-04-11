@@ -1,4 +1,4 @@
-# zinx-websocket
+# zinxwebsocket
 
 根据zinx写的websocket,官方没websocket版本，这里模仿一个
 比如发 msgid = 1 data = "张三"
@@ -6,3 +6,9 @@
 头部固定会添加 Id 与 MessageType两个字段
 
 日志输出 统一是 文件名 + 函数名 + 信息
+
+依赖
+go get -u github.com/gorilla/websocket
+
+gitee地址 https://gitee.com/sundayme/zinxWebsocket
+github地址 https://github.com/weicaijiang/zinxWebsocket

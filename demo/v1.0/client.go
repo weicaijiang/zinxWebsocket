@@ -49,7 +49,7 @@ func main() {
 		log.Println("main ReadMessage read server message", string(msg[:]))
 		//解包
 		dp := znet.DataPack{}
-		recvMsg, err := dp.Unpack(mt, msg)
+		recvMsg, err := dp.Unpack(mt, string(msg))
 		if err != nil {
 			log.Fatal("main ReadMessage Unpack err:", err)
 			return
@@ -59,7 +59,7 @@ func main() {
 		case 10:
 			// log.Println(recvMsg)
 			account := &message.Account{}
-			err = json.Unmarshal(recvMsg.GetData(), account)
+			err = json.Unmarshal([]byte(recvMsg.GetData()), account)
 			if err != nil {
 				log.Fatal("main ReadMessage Unmarshal err:", err)
 				return
@@ -68,7 +68,7 @@ func main() {
 		case 20:
 			// log.Println(recvMsg)
 			room := &message.Room{}
-			err = json.Unmarshal(recvMsg.GetData(), room)
+			err = json.Unmarshal([]byte(recvMsg.GetData()), room)
 			if err != nil {
 				log.Fatal("main ReadMessage Unmarshal err:", err)
 				return
@@ -110,13 +110,13 @@ func timeWriter(conn *websocket.Conn) {
 
 		//封包
 		dp := znet.DataPack{}
-		sendMsg := znet.NewMessage(1, websocket.TextMessage, jsonData)
+		sendMsg := znet.NewMessage(1, websocket.TextMessage, string(jsonData))
 		encryMsg, err := dp.Pack(sendMsg)
 		if err != nil {
 			log.Println("client timeWriter pack err:", err, " msg:", msg)
 			break
 		}
-		conn.WriteMessage(websocket.TextMessage, encryMsg)
+		conn.WriteMessage(websocket.TextMessage, []byte(encryMsg))
 
 		//发第二个消息
 		// msg = &message.Account{Name: "hello, 李四", Age: i, Passwd: "654321"}

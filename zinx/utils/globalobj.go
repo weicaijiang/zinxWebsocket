@@ -30,7 +30,9 @@ type GlobalObj struct {
 	//工作池大小 一般是cpu大小
 	WorkerPoolSize uint32
 	//一个工作池处理消息的最大数量
-	MaxWorkerTaskLen uint32 
+	MaxWorkerTaskLen uint32
+	//发送消息的缓冲最大长度
+	MaxMsgChanLen uint32
 }
 
 var GlobalObject *GlobalObj
@@ -52,15 +54,16 @@ func (g *GlobalObj) Reload() {
 //初始化
 func init() {
 	GlobalObject = &GlobalObj{
-		Name:           "zinx websocket",
-		Scheme:         "ws",
-		Host:           "0.0.0.0",
-		Port:           8999,
-		Path:           "",
-		MaxConn:        1000,
-		MaxPackageSize: 4096,
-		WorkerPoolSize: 4,
+		Name:             "zinx websocket",
+		Scheme:           "ws",
+		Host:             "0.0.0.0",
+		Port:             8999,
+		Path:             "",
+		MaxConn:          1000,
+		MaxPackageSize:   4096,
+		WorkerPoolSize:   4,
 		MaxWorkerTaskLen: 1024,
+		MaxMsgChanLen:    1024,
 	}
 
 	//从conf加载数据

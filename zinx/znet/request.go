@@ -24,7 +24,7 @@ func (r *Request) GetConnection() ziface.IConnection {
 }
 
 //得到请求数据
-func (r *Request) GetData() []byte {
+func (r *Request) GetData() string {
 	return r.message.GetData()
 }
 

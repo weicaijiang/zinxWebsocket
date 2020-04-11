@@ -6,11 +6,11 @@ type Message struct {
 	MessageType int    `json:MessageType` //消息类型 TextMessage 或 BinaryMessage之类
 	Id          uint32 `json:Id`          //消息id
 	//真实数据
-	Data []byte `json:Data` //消息内容
+	Data string `json:Data` //消息内容
 }
 
 //创建消息
-func NewMessage(id uint32, mt int, data []byte) *Message {
+func NewMessage(id uint32, mt int, data string) *Message {
 	m := &Message{
 		Id:          id,
 		Data:        data,
@@ -25,7 +25,7 @@ func (m *Message) GetMsgId() uint32 {
 }
 
 //获取消息数据
-func (m *Message) GetData() []byte {
+func (m *Message) GetData() string {
 	return m.Data
 }
 
@@ -40,7 +40,7 @@ func (m *Message) SetMsgId(id uint32) {
 }
 
 //设置消息数据
-func (m *Message) SetData(data []byte) {
+func (m *Message) SetData(data string) {
 	m.Data = data
 }
 

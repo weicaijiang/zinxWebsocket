@@ -18,7 +18,7 @@ type PingRouter struct {
 func (br *PingRouter) Handle(request ziface.IRequest) {
 	//unmarsh
 	msg := &message.Account{}
-	err := json.Unmarshal(request.GetData(), msg)
+	err := json.Unmarshal([]byte(request.GetData()), msg)
 	if err != nil {
 		log.Println("test Handle Unmarshal err:", err, " msg:", msg)
 		return
@@ -32,7 +32,7 @@ func (br *PingRouter) Handle(request ziface.IRequest) {
 		log.Println("DataPack Pack Marshal err:", err, " responseMsg:", responseMsg)
 		return
 	}
-	err = request.GetConnection().SendMsg(1, 10, jsonData)
+	err = request.GetConnection().SendBuffMsg(1, 10, string(jsonData))
 	if err != nil {
 		log.Println("test Handle WriteMessage err:", err)
 		return
@@ -47,7 +47,7 @@ type SecondRouter struct {
 func (br *SecondRouter) Handle(request ziface.IRequest) {
 	//unmarsh
 	msg := &message.Account{}
-	err := json.Unmarshal(request.GetData(), msg)
+	err := json.Unmarshal([]byte(request.GetData()), msg)
 	if err != nil {
 		log.Println("test Handle Unmarshal err:", err, " msg:", msg)
 		return
@@ -61,7 +61,7 @@ func (br *SecondRouter) Handle(request ziface.IRequest) {
 		log.Println("DataPack Pack Marshal err:", err, " responseMsg:", responseMsg)
 		return
 	}
-	err = request.GetConnection().SendMsg(1, 20, jsonData)
+	err = request.GetConnection().SendMsg(1, 20, string(jsonData))
 	if err != nil {
 		log.Println("test Handle WriteMessage err:", err)
 		return
@@ -85,7 +85,7 @@ func (br *RepeatRouter) Handle(request ziface.IRequest) {
 //回调之后
 func DoConectionBegin(conn ziface.IConnection) {
 	log.Println("DoConectionBegin is called connid:", conn.GetConnID())
-	conn.SendMsg(1, 40, []byte("conn start"))
+	conn.SendMsg(1, 40, "conn start")
 	conn.SetProperty("haohao", "我爱游戏")
 	conn.SetProperty("age", "20")
 }

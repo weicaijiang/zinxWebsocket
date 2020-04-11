@@ -31,6 +31,9 @@ type Connection struct {
 	//无缓冲读写通信
 	msgChan chan Message
 
+	//有缓冲读写通信
+	msgBuffChan chan Message
+
 	//路由管理,用来绑定msgid与api关系
 	MsgHandle ziface.IMsgHandle
 
@@ -44,14 +47,15 @@ type Connection struct {
 //初始化连接方法
 func NewConnection(server ziface.IServer, conn *websocket.Conn, connID uint32, mh ziface.IMsgHandle) *Connection {
 	c := &Connection{
-		WsServer:  server,
-		Conn:      conn,
-		ConnID:    connID,
-		MsgHandle: mh,
-		isClosed:  false,
-		msgChan:   make(chan Message, 1),
-		ExitChan:  make(chan bool, 1),
-		property:  make(map[string]interface{}),
+		WsServer:    server,
+		Conn:        conn,
+		ConnID:      connID,
+		MsgHandle:   mh,
+		isClosed:    false,
+		msgChan:     make(chan Message, 1),
+		msgBuffChan: make(chan Message, utils.GlobalObject.MaxMsgChanLen),
+		ExitChan:    make(chan bool, 1),
+		property:    make(map[string]interface{}),
 	}
 
 	//将当前连接放入connmgr
@@ -78,13 +82,13 @@ func (c *Connection) StartReader() {
 
 		//解包
 		dp := NewDataPack()
-		msg, err := dp.Unpack(messageType, data)
+		msg, err := dp.Unpack(messageType, string(data))
 		if err != nil {
-			log.Println("connection startReader Unpack err:", err)
+			log.Println("connection startReader Unpack messageType:",messageType," data:",string(data)," err:", err)
 			continue //下一个包可能正确
 		}
 		// log.Println(msg)
-		log.Println("connection StartReader recv from client2:", string(msg.GetData()))
+		// log.Println("connection StartReader recv from client2:", string(msg.GetData()))
 
 		//得到request数据
 		req := &Request{
@@ -112,10 +116,23 @@ func (c *Connection) StartWriter() {
 		select {
 		case msg := <-c.msgChan:
 			//有数据接收
-			if err := c.Conn.WriteMessage(msg.MessageType, msg.Data); err != nil {
+			// log.Println("connection StartWriter msg:",string(msg.Data))
+			if err := c.Conn.WriteMessage(msg.MessageType, []byte(msg.Data)); err != nil {
 				//写失败通知关闭连接
-				log.Println("connection StartWriter err:", err)
+				log.Println("connection StartWriter msgchan err:", err)
 				return
+			}
+		case msg, ok := <-c.msgBuffChan:
+			if ok {
+				// log.Println("connection StartWriter buffmsg:",string(msg.Data))
+				if err := c.Conn.WriteMessage(msg.MessageType, []byte(msg.Data)); err != nil {
+					//写失败通知关闭连接
+					log.Println("connection StartWriter msgbuff err:", err)
+					return
+				}
+			} else {
+				log.Println("connection StartWriter msgbuff is closed")
+				break
 			}
 		case <-c.ExitChan:
 			//读出错了
@@ -162,6 +179,7 @@ func (c *Connection) Stop() {
 	//关闭管道
 	close(c.ExitChan)
 	close(c.msgChan)
+	close(c.msgBuffChan)
 	log.Println("connection stop end connid:", c.ConnID, " isClosed:", c.isClosed)
 }
 
@@ -180,8 +198,8 @@ func (c *Connection) RemoteAddr() net.Addr {
 	return c.Conn.RemoteAddr()
 }
 
-//发送数据，将数据发送给远程客户端
-func (c *Connection) SendMsg(messageType int, id uint32, data []byte) error {
+//发送数据，将数据发送给远程客户端（无缓冲）
+func (c *Connection) SendMsg(messageType int, id uint32, data string) error {
 	if c.isClosed {
 		return errors.New("connection sendmsg is closed1")
 	}
@@ -194,10 +212,34 @@ func (c *Connection) SendMsg(messageType int, id uint32, data []byte) error {
 
 	//重新设置下加密后的data
 	message.SetData(decryMsg)
-	log.Println("connection sendmsg isclosed = ", c.isClosed)
+	// log.Println("connection sendmsg isclosed = ", c.isClosed)
 
 	//发消息给通道
 	c.msgChan <- *message
+
+	return nil
+}
+
+//发送数据，将数据发送给远程客户端（有缓冲）
+func (c *Connection) SendBuffMsg(messageType int, id uint32, data string) error {
+	if c.isClosed {
+		return errors.New("connection SendBuffMsg is closed1")
+	}
+	// log.Println("connection SendBuffMsg data1 = ", data)
+	// log.Println("connection SendBuffMsg data2 = ", string(data))
+	dp := NewDataPack()
+	message := NewMessage(id, messageType, data)
+	decryMsg, err := dp.Pack(message)
+	if err != nil {
+		return errors.New("connection SendBuffMsg Pack error")
+	}
+
+	//重新设置下加密后的data
+	message.SetData(decryMsg)
+	// log.Println("connection SendBuffMsg isclosed = ", c.isClosed)
+
+	//发消息给通道
+	c.msgBuffChan <- *message
 
 	return nil
 }

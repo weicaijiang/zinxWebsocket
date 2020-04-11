@@ -6,5 +6,6 @@
     "Path":"",
     "MaxConn":3,
     "MaxPackageSize":4096,
-    "WorkerPoolSize":4
+    "WorkerPoolSize":4,
+    "MaxMsgChanLen":10
 }

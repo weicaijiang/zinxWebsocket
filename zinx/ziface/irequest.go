@@ -6,7 +6,7 @@ type IRequest interface {
 	GetConnection() IConnection
 
 	//得到请求数据
-	GetData() []byte
+	GetData() string
 
 	//得到请求类型
 	GetMessageType() int
