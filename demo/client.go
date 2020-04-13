@@ -8,16 +8,15 @@ import (
 	"os"
 	"os/signal"
 
-	// "strconv"
+	"strconv"
 
-	// "time"
+	"time"
 	"zinxWebsocket/demo/message"
-	"zinxWebsocket/zinx/znet"
 
 	"github.com/gorilla/websocket"
 )
 
-var max = 1
+var max = 3
 
 func main() {
 	interrupt := make(chan os.Signal, 1)
@@ -36,37 +35,27 @@ func main() {
 
 	go timeWriter(conn)
 
-	i := 0
+	// i := 0
 	for {
-		log.Println("main ReadMessage start")
+		//第一个包
+		// log.Println("main ReadMessage start")
 		mt, msg, err := conn.ReadMessage()
 		if err != nil {
 			log.Fatal("read err:", err)
 			return
 		}
-		log.Println("main ReadMessage read server message", string(msg[:]))
-		//解包
-		dp := znet.DataPack{}
-		recvMsg , err := dp.Unpack(mt,msg)
-		if err != nil {
-			log.Fatal("main ReadMessage Unpack err:", err)
-			return
-		}
-		log.Println(recvMsg)
-		room := &message.Room{}
-		err = json.Unmarshal(recvMsg.GetData(),room)
-		if err != nil {
-			log.Fatal("main ReadMessage Unmarshal err:", err)
-			return
-		}
-		log.Println(room)
-		// break
-		i++
-		if i > max {
-			break
-		}
-	}
+		log.Println("main ReadMessage read server mt:", mt, " message:", string(msg[:]))
 
+		// break
+		// i++
+		// if i > max {
+		// 	break
+		// }
+	}
+	//阻塞
+	// select {}
+	time.Sleep(60 * time.Second)
+	log.Println("client exit")
 }
 
 func timeWriter(conn *websocket.Conn) {
@@ -75,30 +64,34 @@ func timeWriter(conn *websocket.Conn) {
 		// log.Println("WriteMessage start timeWriter i = ", i)
 
 		//发第一个消息
-		msg := &message.Account{Name: "hello,张三", Age: i, Passwd: "123456"}
+		msg := &message.Account{Name: "第一个包 hello,张三", Age: i, Passwd: "123456"}
 		jsonData, err := json.Marshal(msg)
 		if err != nil {
 			log.Println("client timeWriter Marshal err:", err, " msg:", msg)
 			break
 		}
-		log.Println("client timeWriter jsonData = ", string(jsonData))
-
-		//封包
-		dp := znet.DataPack{}
-		sendMsg := znet.NewMessage(1, websocket.TextMessage, jsonData)
-		encryMsg, err := dp.Pack(sendMsg)
-		if err != nil {
-			log.Println("client timeWriter pack err:", err, " msg:", msg)
-			break
-		}
-		conn.WriteMessage(websocket.TextMessage, encryMsg)
-		
+		conn.WriteMessage(websocket.TextMessage, jsonData)
 
 		//发第二个消息
+		msg = &message.Account{Name: "第二个包 hello, 李四", Age: i, Passwd: "654321"}
+		jsonData, err = json.Marshal(msg)
+		if err != nil {
+			log.Println("client timeWriter Marshal err:", err, " msg:", msg)
+			break
+		}
+		conn.WriteMessage(websocket.TextMessage, jsonData)
+
+		// //第三个是回写数据
+		repeatMsg := []byte("第三个包repeat message i = " + strconv.Itoa(i))
+		conn.WriteMessage(websocket.TextMessage, repeatMsg)
+
+		//cpu阻塞下，等待读取完
+		time.Sleep(5 * time.Second)
 
 		i++
 		if i > max {
 			break
 		}
 	}
+
 }

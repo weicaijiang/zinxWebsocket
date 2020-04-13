@@ -8,8 +8,8 @@ import (
 
 //连接管理
 type IConnection interface {
-	//启动连接，让当前连接，开始工作
-	Start()
+	//启动连接，让当前连接，开始工作 此接口不能暴露给前端
+	// Start()
 
 	//停止连接，结束当前连接工作
 	Stop()
@@ -24,10 +24,10 @@ type IConnection interface {
 	RemoteAddr() net.Addr
 
 	//发送数据，将数据发送给远程客户端（无缓冲）
-	SendMsg(messageType int, id uint32, data string) error
+	SendMsg(data string) error
 
 	//发送数据，将数据发送给远程客户端（有缓冲）
-	SendBuffMsg(messageType int, id uint32, data string) error
+	SendBuffMsg(data string) error
 
 	//设置连接属性
 	SetProperty(key string, value interface{})
@@ -37,4 +37,10 @@ type IConnection interface {
 
 	//移除设置属性
 	RemoveProperty(key string)
+
+	//得到当前消息类型
+	GetMessageType() int
+
+	//是否关闭
+	IsClosed() bool
 }

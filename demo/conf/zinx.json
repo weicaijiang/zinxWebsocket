@@ -1,10 +1,11 @@
 {
-    "Name":"zinx websocket version 8",
+    "Name":"zinx websocket version",
     "Host":"0.0.0.0",
     "Port":8999,
     "Scheme":"ws",
     "Path":"",
     "MaxConn":3,
     "MaxPackageSize":4096,
-    "WorkerPoolSize":4
+    "WorkerPoolSize":4,
+    "MaxMsgChanLen":10
 }

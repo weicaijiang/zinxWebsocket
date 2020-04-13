@@ -9,7 +9,7 @@ type IServer interface {
 	//运行状态
 	Serve()
 	//添加路由
-	AddRouter(msgId uint32, router IRouter)
+	SetRouter(router IRouter)
 	//返回 连接管理
 	GetConnMgr() IConnManager
 	//连接之前回调

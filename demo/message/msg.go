@@ -2,14 +2,14 @@ package message
 
 //测试结构体
 type Account struct {
-	Name   string
-	Age    int
-	Passwd string
+	Name   string `json:"name"`
+	Age    int `json:"age"`
+	Passwd string `json:"passwd"`
 }
 
 //测试结构体
 type Room struct {
-	Name   string
-	Port    int
-	Level  int
+	Name   string `json:"name"`
+	Port    int `json:"port"`
+	Level  int `json:"level"`
 }

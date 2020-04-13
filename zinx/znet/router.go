@@ -1,6 +1,7 @@
 package znet
 
 import "zinxWebsocket/zinx/ziface"
+import "log"
 
 //实现router，先嵌入基类
 type BaseRouter struct {
@@ -10,7 +11,10 @@ type BaseRouter struct {
 func (br *BaseRouter) PreHandle(request ziface.IRequest) {}
 
 //处理业务
-func (br *BaseRouter) Handle(request ziface.IRequest) {}
+func (br *BaseRouter) Handle(request ziface.IRequest) {
+	//主业务不给路由，就提示一条输出信息
+	log.Println("Handle msg:",request.GetData())
+}
 
 //处理业务之后
 func (br *BaseRouter) PostHandle(request ziface.IRequest) {}
@@ -19,6 +23,3 @@ func (br *BaseRouter) PostHandle(request ziface.IRequest) {}
 type Router struct {
 	BaseRouter
 }
-
-//创建实例
-// func NewRouter()

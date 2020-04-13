@@ -1,9 +1,0 @@
-{
-    "Name":"zinx websocket version 7",
-    "Host":"0.0.0.0",
-    "Port":8999,
-    "Scheme":"ws",
-    "Path":"",
-    "MaxConn":3,
-    "MaxPackageSize":4096
-}

@@ -74,10 +74,11 @@ func (s *Server) wsHandler(w http.ResponseWriter, r *http.Request) {
 //启动
 func (s *Server) Start() {
 	log.Println("server start name:", utils.GlobalObject.Name, " scheme:", s.Scheme, " ip:", s.Host, " port:", strconv.Itoa(int(s.Port)), " path:", s.Path,
-		" MaxConn:", utils.GlobalObject.MaxConn, " MaxPackageSize:", utils.GlobalObject.MaxPackageSize)
+		" MaxConn:", utils.GlobalObject.MaxConn, " MaxPackageSize:", utils.GlobalObject.MaxPackageSize,
+		" WorkerPoolSize:",utils.GlobalObject.WorkerPoolSize)
 	//开启工作线程
 	s.MsgHandle.StartWorkerPool()
-
+	
 	http.HandleFunc("/"+s.Path, s.wsHandler)
 	err := http.ListenAndServe(s.Host+":"+strconv.Itoa(int(s.Port)), nil)
 	if err != nil {
@@ -101,8 +102,8 @@ func (s *Server) Serve() {
 }
 
 //添加路由
-func (s *Server) AddRouter(msgId uint32, router ziface.IRouter) {
-	s.MsgHandle.AddRouter(msgId, router)
+func (s *Server) SetRouter( router ziface.IRouter) {
+	s.MsgHandle.SetRouter(router)
 }
 
 //返回 连接管理
