@@ -5,8 +5,8 @@ import (
 	"log"
 	"net"
 	"sync"
-	"zinxWebsocket/zinx/utils"
-	"zinxWebsocket/zinx/ziface"
+	"zinxWebsocket/utils"
+	"zinxWebsocket/ziface"
 
 	"github.com/gorilla/websocket"
 )
@@ -204,6 +204,16 @@ func (c *Connection) SendMsg(data string) error {
 	return nil
 }
 
+//发送数据，将数据发送给远程客户端（无缓冲）
+func (c *Connection) SendByteMsg(data []byte) error {
+	return c.SendMsg(string(data))
+}
+
+//发送数据，将数据发送给远程客户端（有缓冲）
+func (c *Connection) SendBuffByteMsg(data []byte) error {
+	return c.SendBuffMsg(string(data))
+}
+
 //发送数据，将数据发送给远程客户端（有缓冲）
 func (c *Connection) SendBuffMsg(data string) error {
 	if c.isClosed {
@@ -251,6 +261,6 @@ func (c *Connection) GetMessageType() int {
 }
 
 //是否关闭
-func (c *Connection) IsClosed() bool{
+func (c *Connection) IsClosed() bool {
 	return c.isClosed
 }

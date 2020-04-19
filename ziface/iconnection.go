@@ -29,6 +29,12 @@ type IConnection interface {
 	//发送数据，将数据发送给远程客户端（有缓冲）
 	SendBuffMsg(data string) error
 
+	//发送数据，将数据发送给远程客户端（无缓冲）
+	SendByteMsg(data []byte) error
+
+	//发送数据，将数据发送给远程客户端（有缓冲）
+	SendBuffByteMsg(data []byte) error
+
 	//设置连接属性
 	SetProperty(key string, value interface{})
 

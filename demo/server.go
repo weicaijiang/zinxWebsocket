@@ -3,12 +3,13 @@ package main
 import (
 	// "encoding/base64"
 	"encoding/json"
+	"github.com/gorilla/websocket"
 	"log"
 	"strconv"
 	"time"
 	"zinxWebsocket/demo/message"
-	"zinxWebsocket/zinx/ziface"
-	"zinxWebsocket/zinx/znet"
+	"zinxWebsocket/ziface"
+	"zinxWebsocket/znet"
 )
 
 //测试路由
@@ -43,6 +44,10 @@ func (br *PingRouter) Handle(request ziface.IRequest) {
 		log.Println("PingRouter Handle WriteMessage err:", err)
 		return
 	}
+	request.GetConnection().SendMsg("我是服务器string包")
+	request.GetConnection().SendByteMsg([]byte("我是服务器byte包"))
+	request.GetConnection().SendBuffMsg("我是服务器buff包")
+	request.GetConnection().SendBuffByteMsg([]byte("我是服务器buff byte包"))
 	//再发下时间
 	request.GetConnection().SendBuffMsg("服务器unix时间:" + strconv.Itoa(int(time.Now().Unix())))
 }
@@ -84,6 +89,12 @@ func DoConectionEnd(conn ziface.IConnection) {
 	}
 }
 
+//超出最大连接回调
+func MaxConection(conn *websocket.Conn) {
+	log.Println("MaxConection is called connip:", conn.RemoteAddr().String())
+	conn.WriteMessage(websocket.TextMessage, []byte("好好呀MaxConection"))
+}
+
 func main() {
 	//创建一个实例
 	s := znet.NewServer()
@@ -91,6 +102,9 @@ func main() {
 	//注意连接回调
 	s.SetOnConnStart(DoConectionBegin)
 	s.SetOnConnStop(DoConectionEnd)
+
+	//最大连接
+	s.SetOnMaxConn(MaxConection)
 
 	//回写测试
 	s.SetRouter(&RepeatRouter{})

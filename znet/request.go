@@ -1,6 +1,6 @@
 package znet
 
-import "zinxWebsocket/zinx/ziface"
+import "zinxWebsocket/ziface"
 
 type Request struct {
 	//当前用户连接

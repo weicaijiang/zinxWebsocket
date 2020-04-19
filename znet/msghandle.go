@@ -3,8 +3,8 @@ package znet
 import (
 	"log"
 	// "strconv"
-	"zinxWebsocket/zinx/utils"
-	"zinxWebsocket/zinx/ziface"
+	"zinxWebsocket/utils"
+	"zinxWebsocket/ziface"
 )
 
 //消息处理模块

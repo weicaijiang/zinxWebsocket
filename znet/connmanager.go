@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 	"sync"
-	"zinxWebsocket/zinx/ziface"
+	"zinxWebsocket/ziface"
 )
 
 //连接管理

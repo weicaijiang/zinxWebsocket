@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
-	"zinxWebsocket/zinx/ziface"
+	"zinxWebsocket/ziface"
 )
 
 //存储一些数据供全局使用

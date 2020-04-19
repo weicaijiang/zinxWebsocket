@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"zinxWebsocket/zinx/utils"
-	"zinxWebsocket/zinx/ziface"
+	"zinxWebsocket/utils"
+	"zinxWebsocket/ziface"
 
 	"github.com/gorilla/websocket"
 )
@@ -31,6 +31,8 @@ type Server struct {
 	OnConnStart func(ziface.IConnection)
 	//关闭回调
 	OnConnStop func(ziface.IConnection)
+	//超过最大连接回调
+	OnMaxConn func(conn *websocket.Conn)
 }
 
 //连接信息
@@ -60,6 +62,7 @@ func (s *Server) wsHandler(w http.ResponseWriter, r *http.Request) {
 	if s.ConnMgr.Len() >= utils.GlobalObject.MaxConn {
 		//todo 给用户发一个关闭连接消息
 		log.Println("server wsHandler too many connection")
+		s.CallOMaxConn(conn)
 		conn.Close()
 		return
 	}
@@ -75,10 +78,10 @@ func (s *Server) wsHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) Start() {
 	log.Println("server start name:", utils.GlobalObject.Name, " scheme:", s.Scheme, " ip:", s.Host, " port:", strconv.Itoa(int(s.Port)), " path:", s.Path,
 		" MaxConn:", utils.GlobalObject.MaxConn, " MaxPackageSize:", utils.GlobalObject.MaxPackageSize,
-		" WorkerPoolSize:",utils.GlobalObject.WorkerPoolSize)
+		" WorkerPoolSize:", utils.GlobalObject.WorkerPoolSize)
 	//开启工作线程
 	s.MsgHandle.StartWorkerPool()
-	
+
 	http.HandleFunc("/"+s.Path, s.wsHandler)
 	err := http.ListenAndServe(s.Host+":"+strconv.Itoa(int(s.Port)), nil)
 	if err != nil {
@@ -102,7 +105,7 @@ func (s *Server) Serve() {
 }
 
 //添加路由
-func (s *Server) SetRouter( router ziface.IRouter) {
+func (s *Server) SetRouter(router ziface.IRouter) {
 	s.MsgHandle.SetRouter(router)
 }
 
@@ -137,6 +140,20 @@ func (s *Server) CallOnConnStop(conn ziface.IConnection) {
 		return
 	}
 	s.OnConnStop(conn)
+}
+
+//超过最大连接回调
+func (s *Server) SetOnMaxConn(hookConn func(conn *websocket.Conn)) {
+	s.OnMaxConn = hookConn
+}
+
+//超过最大连接回调
+func (s *Server) CallOMaxConn(conn *websocket.Conn) {
+	if s.OnMaxConn == nil {
+		log.Println("server CallOMaxConn error is nil")
+		return
+	}
+	s.OnMaxConn(conn)
 }
 
 //初始化
